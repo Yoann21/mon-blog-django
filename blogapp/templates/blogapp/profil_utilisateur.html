@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Profil de {{ utilisateur_profil.username }} - Mon Super Blog{% endblock %}
+
+{% block content %}
+<div class="profil-header">
+    <h1>👤 Profil de {{ utilisateur_profil.username }}</h1>
+    <p>📅 Membre depuis : {{ utilisateur_profil.date_joined|date:"d F Y" }}</p>
+    
+    {% if user.is_authenticated and user == utilisateur_profil %}
+        {# Plus tard, on pourrait ajouter un lien pour modifier le profil ici #} 
+        {# <p><a href="#" class="button-link">Modifier mon profil</a></p> #}
+    {% endif %}
+</div>
+
+<hr class="profil-separator">
+
+<div class="profil-articles">
+    <h2>📝 Articles écrits par {{ utilisateur_profil.username }} ({{ articles_utilisateur.count }})</h2>
+    
+    {% if articles_utilisateur %}
+        <ul class="article-list">
+            {% for article_item in articles_utilisateur %}
+                <li>
+                    <h3>
+                        <a href="{% url 'blogapp:detail_article' pk=article_item.pk %}">
+                            {{ article_item.titre }}
+                        </a>
+                    </h3>
+                    <p class="article-meta">
+                        📅 Publié le : {{ article_item.date_creation|date:"d M Y, H:i" }}
+                        {% if article_item.date_creation != article_item.date_mise_a_jour %}
+                            | 🔄 Modifié le : {{ article_item.date_mise_a_jour|date:"d M Y, H:i" }}
+                        {% endif %}
+                    </p>
+                    <p>{{ article_item.contenu|truncatewords:20 }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-center" style="color: #7f8c8d; font-style: italic;">
+            {{ utilisateur_profil.username }} n'a pas encore écrit d'articles. 📭
+        </p>
+    {% endif %}
+</div>
+
+{% endblock %}

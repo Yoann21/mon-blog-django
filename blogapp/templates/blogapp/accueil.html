@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil - Mon Super Blog{% endblock %}
+
+{% block content %}
+<h1> Bienvenue sur Mon Super Blog !</h1>
+
+{% if user.is_authenticated %}
+    <p>
+        Vous êtes connecté en tant que <strong>{{ user.username }}</strong>. 
+        <a href="{% url 'blogapp:creer_article' %}"> Écrire un nouvel article ?</a>
+    </p>
+{% else %}
+    <p>
+        Vous pouvez vous 
+        <a href="{% url 'blogapp:connexion' %}">connecter</a> 
+        pour écrire des articles ou vous 
+        <a href="{% url 'blogapp:inscription' %}">inscrire</a>.
+    </p>
+{% endif %}
+
+<h2> Nos derniers articles:</h2>
+
+{% if articles_a_afficher %}
+    <ul class="article-list">
+        {% for article_item in articles_a_afficher %}
+            <li>
+                <h3>
+                    <a href="{% url 'blogapp:detail_article' pk=article_item.pk %}">
+                        {{ article_item.titre }}
+                    </a>
+                </h3>
+                <p class="article-meta">
+                     Par : 
+                    <a href="{% url 'blogapp:profil_utilisateur' username=article_item.auteur.username %}">
+                        <strong>{{ article_item.auteur.username }}</strong>
+                    </a> | 
+                    📅 {{ article_item.date_creation|date:"d M Y, H:i" }}
+                </p>
+                <p>{{ article_item.contenu|truncatewords:30 }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+    
+    <!-- Section de pagination -->
+    <div class="pagination">
+        <span class="step-links">
+            {% if articles_a_afficher.has_previous %}
+                <a href="?page=1" class="button-link">« Première</a>
+                <a href="?page={{ articles_a_afficher.previous_page_number }}" class="button-link">‹ Précédente</a>
+            {% else %}
+                <span class="disabled-link">« Première</span>
+                <span class="disabled-link">‹ Précédente</span>
+            {% endif %}
+            
+            <span class="current-page">
+                Page {{ articles_a_afficher.number }} sur {{ articles_a_afficher.paginator.num_pages }}
+            </span>
+            
+            {% if articles_a_afficher.has_next %}
+                <a href="?page={{ articles_a_afficher.next_page_number }}" class="button-link">Suivante ›</a>
+                <a href="?page={{ articles_a_afficher.paginator.num_pages }}" class="button-link">Dernière »</a>
+            {% else %}
+                <span class="disabled-link">Suivante ›</span>
+                <span class="disabled-link">Dernière »</span>
+            {% endif %}
+        </span>
+    </div>
+{% else %}
+    <p>
+        Il n'y a pas encore d'articles sur ce blog. Soyez le premier à en écrire un ! 🚀
+    </p>
+{% endif %}
+{% endblock %}
